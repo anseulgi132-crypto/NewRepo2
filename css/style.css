@@ -176,3 +176,21 @@ h3.small-title{
 li.trivia{
     margin-top: 15px;
 }
+
+blockquote.quote {
+  margin: 20px 0;
+  padding: 16px 20px;
+  background-color: #414141;
+  border-left: 4px solid #324875;
+  border-radius: 0 6px 6px 0;
+  font-weight: 500;
+  line-height: 1.8;
+}
+
+blockquote.quote p {
+  margin: 0;
+}
+
+blockquote.quote p + p {
+  margin-top: 10px;
+}
