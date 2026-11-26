@@ -1,0 +1,124 @@
+<style>
+    .party-template {
+        max-width: 800px;
+        background-color: #303030;
+        border: 1px solid #555;
+        border-radius: 8px;
+        padding: 15px 20px;
+        margin-top: 30px;
+    }
+
+    .party-template h3 {
+        font-size: 40px;
+        text-align: center;
+        padding: 5px 0px;
+        color: #ffffff;
+    }
+
+
+    .party-template h2 {
+        font-size: 20px;
+        text-align: center;
+        padding: 5px 0px;
+        color: #ffffff;
+    }
+
+    .party-template ruby{
+    font-size: 40px;
+    font-weight: normal;
+    text-align: center;
+    
+    }
+
+    .party-template ruby rt {
+    padding-bottom: 5px;
+    font-size: 0.3em;
+    font-weight: normal;
+    text-align: center;
+    }
+
+    .party-member{
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+    }
+    .image-container {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .image-crop {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        overflow: hidden;
+        flex-shrink: 1;
+    }
+
+    .image-crop img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+</style>
+
+<div class="party-template">
+    <h3><ruby> 심상 <rt>SHINSHO</rt></ruby><ruby> 탐색부 <rt>SEEKER</rt></ruby></h3>
+    <div class = "party-member">
+
+        <a href = "/html/ryo.html">
+            <div class="image-container">
+                <div class="image-crop">
+                    <img src="/image/ryo1.png">
+                </div>
+            </div>
+            <div style="background-color: #C35F69;"><h2>주인공(심상 시커 4)</h2></div>
+        </a>
+
+        <a href = "/html/harnire.html">
+            <div class="image-container">
+                <div class="image-crop">
+                    <img src="/image/harnire1.png">
+                </div>
+            </div>
+            <div style="background-color: #296A31;"><h2>하르니레</h2></div>
+        </a>
+
+
+        <a href = "/html/kohei.html">
+            <div class="image-container">
+                <div class="image-crop">
+                    <img src="/image/kohei1.png">
+                </div>
+            </div>
+            <div style="background-color: #005cac;"><h2>시노하라 코헤이</h2></div>
+        </a>
+
+        <a href = "/html/kana.html">
+            <div class="image-container">
+                <div class="image-crop">
+                    <img src="/image/kana1.png">
+                </div>
+            </div>
+            <div style="background-color: #FFAB51;"><h2>오가와 카나</h2></div>
+        </a>
+        <a href = "/html/shuichi.html">
+            <div class="image-container">
+                <div class="image-crop">
+                    <img src="/image/shuichi1.png">
+                </div>
+            </div>
+            <div style="background-color: #418781;"><h2>키리시마 슈이치</h2></div>
+        </a>
+
+        <a href = "/html/towa.html">
+            <div class="image-container">
+                <div class="image-crop">
+                    <img src="/image/towa1.png">
+                </div>
+            </div>
+            <div style="background-color: #DCA1E9;"><h2>히가시야마 토와</h2></div>
+        </a>
+    </div>
+</div>

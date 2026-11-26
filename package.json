@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "marked": "^18.2.1",
+    "marked-footnote": "^1.4.0"
+  }
+}
