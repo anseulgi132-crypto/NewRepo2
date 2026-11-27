@@ -1,5 +1,4 @@
-﻿
-@font-face {
+﻿@font-face {
     font-family: "mj";
     src: url("font/NanumMyeongjo-Regular.ttf") format("truetype");
 }
@@ -8,7 +7,6 @@
     font-family: "gt";
     src: url("font/NanumGothic-Regular.ttf") format("truetype");
 }
-
 
 
 a {
@@ -31,9 +29,6 @@ body {
 p {
     margin-bottom: 10px;
 }
-
-
-
 
 
 .toc {
@@ -68,7 +63,6 @@ p {
 }
 
 
-
 main {
     max-width: 900px;
     margin: 30px auto;
@@ -90,23 +84,15 @@ main p {
     line-height: 1.6;
 }
 
-main img{
+main img {
     max-width: 300px;
-}
-
-h1.content-title {
-    font-size: 50px;
-}
-
-h1.content-title {
-    font-size: 35px;
 }
 
 h1.content-title {
     font-size: 40px;
 }
 
-.up-box{
+.up-box {
     display: flex;
     flex-direction: row; /* 데스크톱: 가로 배치 */
     gap: 20px;
@@ -134,17 +120,17 @@ h1.content-title {
 .panel h3 {
     text-align: center;
 }
-.panel-content{
+.panel-content {
     border: 1px solid #ffffff;
     padding:5px 25px;
     display: flex;
     gap: 20px
 }
-p.panel-content1{
+p.panel-content1 {
     width: 100px;
     align-self: center;
 }
-p.panel-content2{
+p.panel-content2 {
     width: 260px;
 }
 
@@ -160,20 +146,19 @@ p.quote-from {
     font-style: italic;
 }
 
-h2.big-title{
+h2.big-title {
     margin-top: 40px;
     font-size: 25;
     font-weight: bold;
 }
 
-
-h3.small-title{
+h3.small-title {
     margin: 10px 30px;
     font-size: 20;
     font-weight: bold;
 }
 
-li.trivia{
+li.trivia {
     margin-top: 15px;
 }
 
@@ -193,4 +178,106 @@ blockquote.quote p {
 
 blockquote.quote p + p {
   margin-top: 10px;
+}
+
+
+header a {
+    margin-left: 30px;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+}
+
+header img {
+    width: 200px;
+    height: auto;
+}
+
+.title-box {
+    display: flex;
+    flex-direction: column;
+}
+
+header h1,
+header p {
+    margin: 5px;
+}
+
+header h1 {
+    font-size: 24px;
+}
+
+header p {
+    color: #aaaaaa;
+    font-size: 12px;
+}
+
+
+.party-template {
+    max-width: 800px;
+    background-color: #303030;
+    border: 1px solid #555;
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin-top: 30px;
+}
+
+.party-name {
+    font-size: 40px;
+    font-weight: bold;
+    text-align: center;
+    margin: 1em 0;
+    padding: 5px 0px;
+    color: #ffffff;
+}
+
+
+.party-template strong {
+    font-size: 20px;
+    text-align: center;
+    padding: 5px 0px;
+    color: #ffffff;
+}
+
+.party-template ruby {
+    font-size: 40px;
+    font-weight: normal;
+    text-align: center;
+}
+
+.party-template ruby rt {
+    padding-bottom: 5px;
+    font-size: 0.3em;
+    font-weight: normal;
+    text-align: center;
+}
+
+.party-member {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+.party-member span {
+  display: block;
+}
+.image-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.image-crop {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    flex-shrink: 1;
+}
+
+.image-crop img {
+    width: 100%;
+    height: auto;
+    display: block;
 }

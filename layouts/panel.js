@@ -1,10 +1,5 @@
 import { marked } from 'marked';
-
-const esc = (v) => String(v ?? '')
-  .replace(/&/g, '&amp;')
-  .replace(/</g, '&lt;')
-  .replace(/>/g, '&gt;')
-  .replace(/"/g, '&quot;');
+import { esc } from './util.js';
 
 // Markdown → HTML 변환
 const md = (v) => marked.parseInline(String(v ?? ''));
@@ -15,7 +10,7 @@ export default function panel(p) {
       ? value.map(md).join('<br>')
       : md(value);
 
-    return `
+    return `\
       <div class="panel-content">
         <p class="panel-content1">${esc(key)}</p>
         <p class="panel-content2">${values}</p>

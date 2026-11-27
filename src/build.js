@@ -2,18 +2,15 @@
 import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { Marked } from "marked";
-import markedFootnote from "marked-footnote";
-import layout from '../layouts/index.js';
+import { Marked } from 'marked';
+import markedFootnote from 'marked-footnote';
+import { render, components } from '../layouts/index.js';
 
-// HTML 특수문자 처리
-function escapeHTML(text) {
-  return String(text ?? '')
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;');
-}
+const esc = (value) => String(value ?? '')
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;');
 
 // Markdown → HTML 변환 및 목차 생성
 function convert(md) {
@@ -26,13 +23,18 @@ function convert(md) {
 
   const marked = new Marked({
     renderer: {
-      heading({ text, tokens, depth }) {
-        // h2, h3만 자동 번호를 붙인다.
-        if (depth !== 2 && depth !== 3) {
-          return `<h${depth}>${this.parser.parseInline(tokens)}</h${depth}>`;
-        }
-
+      heading({ tokens, depth }) {
+        const content = this.parser.parseInline(tokens);
         const h2 = depth === 2;
+
+        // h2, h3만 자동 번호를 붙인다.
+        // 단, h2보다 먼저 등장한 h3는 일반 제목으로 처리한다.
+        if (
+          (!h2 && depth !== 3) ||
+          (depth === 3 && major === 0)
+        ) {
+          return `<h${depth}>${content}</h${depth}>\n`;
+        }
 
         if (h2) {
           major++;
@@ -65,42 +67,53 @@ function convert(md) {
           ? `${major}`
           : `${major}.${minor}`;
 
-        const title = this.parser.parseInline(tokens);
+        // 목차에서는 링크나 강조 등의 마크다운 서식을 제거
+        const tocText = esc(
+          this.parser.parseInline(
+            tokens,
+            this.parser.textRenderer
+          )
+        );
 
         toc.push(
-          `<li><a href="#${id}">${number}. ${title}</a>`
+          `<li><a href="#${id}">${number}. ${tocText}</a>`
         );
 
         if (!h2) {
           toc.push('</li>');
         }
 
-        const className = h2 ? 'big-title' : 'small-title';
+        const className = h2
+          ? 'big-title'
+          : 'small-title';
 
-        return `<h${depth} id="${id}" class="${className}">${title}</h${depth}>${h2 ? '\n<hr>' : ''}`;
+        return `<h${depth} id="${id}" class="${className}">${content}</h${depth}>\n`;
       },
 
       // 기존 위키 전용 컴포넌트
       html({ raw }) {
-        if (raw.trim() === '<!-- component: party4 -->') {
-          return '<div id="party4"></div>';
+        const name = raw.trim();
+
+        if (
+          name.startsWith('<!--') &&
+          Object.hasOwn(components, name)
+        ) {
+          return components[name];
         }
 
-        return raw;
+        return false;
       },
 
-      listitem({ tokens }) {
-        const content = this.parser.parse(tokens, {
-          textRenderer: false
-        });
-
-        return `<li class="trivia">${content}</li>`;
+      // 기존 리스트 CSS 유지
+      listitem({ tokens, loose }) {
+        const content = this.parser.parse(tokens, loose);
+        return `<li class="trivia">${content}</li>\n`;
       },
 
       // 기존 인용문 CSS 유지
       blockquote({ tokens }) {
         const content = this.parser.parse(tokens);
-        return `<blockquote class="quote">${content}</blockquote>`;
+        return `<blockquote class="quote">${content}</blockquote>\n`;
       },
     },
   });
@@ -109,6 +122,7 @@ function convert(md) {
 
   const content = marked.parse(md);
 
+  // 열린 목차 태그 닫기
   if (subOpen) {
     toc.push('</ul>');
   }
@@ -119,17 +133,27 @@ function convert(md) {
 
   return {
     content,
-    toc: `<ul>${toc.join('\n')}</ul>`,
+    toc: toc.length > 0
+      ? `<ul>${toc.join('\n')}</ul>`
+      : '',
   };
 }
+
+// Front Matter 추출
 function parseFrontMatter(text, name) {
-  text = text.replace(/\r\n?/g, '\n').replace(/^\uFEFF/, '');
+  if (text[0] === '\uFEFF') {
+    text = text.slice(1);
+  }
+
+  text = text
+    .replaceAll('\r\n', '\n')
+    .replaceAll('\r', '\n');
 
   // Front Matter가 없으면 빈 meta 반환
   if (!text.startsWith('---\n')) {
     return {
       meta: {},
-      markdown: text
+      markdown: text,
     };
   }
 
@@ -148,32 +172,41 @@ function parseFrontMatter(text, name) {
   } catch (error) {
     console.error(`\n[Front Matter 오류] ${name}`);
     console.error(rawMeta);
+
     throw new SyntaxError(`${name}: ${error.message}`);
   }
 
-  const markdown = text.slice(index + 5);
-
-  return { meta, markdown };
+  return {
+    meta,
+    markdown: text.slice(index + 5),
+  };
 }
 
 // 프로젝트 경로
-const rootDir = dirname(dirname(fileURLToPath(import.meta.url)));
-const outputDir = join(rootDir, 'dist', 'html');
+const rootDir = dirname(
+  dirname(fileURLToPath(import.meta.url))
+);
+
+const outputDir = join(rootDir, 'dist');
+const docOutputDir = join(outputDir, 'html');
 const dataDir = join(rootDir, 'data');
 const metaDir = join(dataDir, 'meta');
 
 // 파일 목록 및 출력 폴더 준비
 const [files] = await Promise.all([
   readdir(dataDir),
-  mkdir(outputDir, { recursive: true }),
+  mkdir(docOutputDir, { recursive: true }),
 ]);
 
 // Markdown 파일마다 HTML 생성
+const dataExt = '.md';
+const dataExtOffset = -dataExt.length;
+
 await Promise.all(
   files
-    .filter(name => name.endsWith('.md'))
+    .filter(name => name.endsWith(dataExt))
     .map(async (name) => {
-      const baseName = name.slice(0, -3);
+      const baseName = name.slice(0, dataExtOffset);
 
       // 1. Markdown 읽기
       const text = await readFile(
@@ -182,22 +215,33 @@ await Promise.all(
       );
 
       // 2. Front Matter 추출
-      const { meta, markdown } = parseFrontMatter(text, name);
+      const { meta, markdown } = parseFrontMatter(
+        text,
+        name
+      );
 
       // 3. 별도 패널 JSON 읽기 (선택 사항)
-      const panelPath = join(metaDir, baseName + '.json');
+      const panelPath = join(
+        metaDir,
+        baseName + '.json'
+      );
 
       try {
         const panel = JSON.parse(
           await readFile(panelPath, 'utf-8')
         );
 
-        if (!panel.fields || typeof panel.fields !== 'object') {
-          throw new Error(`${baseName}.json: panel fields missing`);
+        if (
+          !panel.fields ||
+          typeof panel.fields !== 'object' ||
+          Array.isArray(panel.fields)
+        ) {
+          throw new Error(
+            `${baseName}.json: panel fields missing`
+          );
         }
 
         meta.panel = panel;
-
       } catch (error) {
         if (error.code !== 'ENOENT') {
           throw error;
@@ -210,11 +254,16 @@ await Promise.all(
       const { content, toc } = convert(markdown);
 
       // 5. 레이아웃 적용 및 HTML 저장
-      const dest = join(outputDir, baseName + '.html');
+      const dest = join(
+        baseName === 'index'
+          ? outputDir
+          : docOutputDir,
+        baseName + '.html'
+      );
 
       await writeFile(
         dest,
-        layout(content, meta, toc),
+        render(content, meta, toc),
         'utf-8'
       );
 
